@@ -1,10 +1,30 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { TouchableOpacity } from "react-native";
+import styled from "styled-components/native";
+import { colors } from "../colors";
+import AuthButton from "../components/auth/AuthButton";
+import { AuthLayout } from "../components/auth/AuthLayout";
 
-export const Welcome = () => {
+const LoginLink = styled.Text`
+  color: ${colors.blue};
+  font-weight: 600;
+  margin-top: 20px;
+`;
+
+export const Welcome = ({ navigation }) => {
+  const goToCreateAccount = () => navigation.navigate("CreateAccount");
+  const goToLogIn = () => navigation.navigate("LogIn");
   return (
-    <View>
-      <Text>Welcome</Text>
-    </View>
+    <AuthLayout>
+      <AuthButton
+        text='Create New Account'
+        disabled={false}
+        onPress={goToCreateAccount}
+      />
+
+      <TouchableOpacity onPress={goToLogIn}>
+        <LoginLink>Log in</LoginLink>
+      </TouchableOpacity>
+    </AuthLayout>
   );
 };
