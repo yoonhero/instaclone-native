@@ -13,8 +13,9 @@ const Container = styled.View`
 const Logo = styled.Image`
   max-width: 50%;
   width: 100%;
-  margin-bottom: 20px;
   height: 100px;
+  margin: 0 auto;
+  margin-bottom: 20px;
 `;
 
 export const AuthLayout = ({ children }) => {

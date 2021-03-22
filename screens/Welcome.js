@@ -8,6 +8,7 @@ import { AuthLayout } from "../components/auth/AuthLayout";
 const LoginLink = styled.Text`
   color: ${colors.blue};
   font-weight: 600;
+  margin: 0 auto;
   margin-top: 20px;
 `;
 
