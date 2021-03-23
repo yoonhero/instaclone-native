@@ -1,19 +1,81 @@
-import React from "react";
-import { Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { gql, useQuery } from "@apollo/client";
+import React, { useState } from "react";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { logUserOut } from "../apollo";
+import Photo from "../components/Photo";
+import ScreenLayout from "../components/ScreenLayout";
+import { COMMENT_FRAGMENT, PHOTO_FRAGMENT } from "../fragments";
+
+export const FEED_QUERY = gql`
+  query seeFeed($offset: Int!) {
+    seeFeed(offset: $offset) {
+      ...PhotoFragment
+      user {
+        username
+        avatar
+      }
+      caption
+      likes
+      comments {
+        ...CommentFragment
+      }
+      createdAt
+      isMine
+      isLiked
+    }
+  }
+  ${PHOTO_FRAGMENT}
+  ${COMMENT_FRAGMENT}
+`;
 
 export default function Feed({ navigation }) {
+  const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
+    variables: {
+      offset: 0,
+    },
+  });
+  console.log(data);
+  const renderPhoto = ({ item: photo }) => {
+    return <Photo {...photo} />;
+  };
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+  const [refreshing, setRefreshing] = useState(false);
+
   return (
-    <View
-      style={{
-        backgroundColor: "black",
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
-      <TouchableOpacity onPress={() => navigation.navigate("Photo")}>
-        <Text style={{ color: "white" }}>Feed</Text>
-      </TouchableOpacity>
-    </View>
+    <ScreenLayout loading={loading}>
+      <FlatList
+        onEndReachedThreshold={0}
+        onEndReached={() =>
+          fetchMore({
+            variables: {
+              offset: data?.seeFeed?.length,
+            },
+          })
+        }
+        style={{ width: "100%" }}
+        showsVerticalScrollIndicator={false}
+        data={data?.seeFeed}
+        keyExtractor={(photo) => "" + photo.id}
+        renderItem={renderPhoto}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tineColor='#fff'
+          />
+        }
+      />
+    </ScreenLayout>
   );
 }
