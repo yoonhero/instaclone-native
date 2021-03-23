@@ -1,4 +1,9 @@
-import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client";
+import {
+  ApolloClient,
+  createHttpLink,
+  InMemoryCache,
+  makeVar,
+} from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const isLoggedInVar = makeVar(false);
@@ -12,6 +17,10 @@ export const logUserIn = async (token) => {
   isLoggedInVar(true);
   tokenVar(token);
 };
+
+const httpLink = createHttpLink({
+  uri: "https://instaclone-backend-yoonhero.herokuapp.com/graphql",
+});
 
 const client = new ApolloClient({
   uri: "https://instaclone-backend-yoonhero.herokuapp.com/graphql",
