@@ -73,7 +73,7 @@ export default function Feed({ navigation }) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tineColor='#fff'
+            tineColor='white'
           />
         }
       />
