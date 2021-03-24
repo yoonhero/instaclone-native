@@ -14,8 +14,8 @@ import ScreenLayout from "../components/ScreenLayout";
 import { COMMENT_FRAGMENT, PHOTO_FRAGMENT } from "../fragments";
 
 export const FEED_QUERY = gql`
-  query seeFeed($offset: Int!) {
-    seeFeed(offset: $offset) {
+  query seeFeed($offset: Int!, $limit: Int!) {
+    seeFeed(offset: $offset, limit: $limit) {
       ...PhotoFragment
       user {
         username
@@ -39,9 +39,9 @@ export default function Feed({ navigation }) {
   const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
     variables: {
       offset: 0,
+      limit: 2,
     },
   });
-  console.log(data);
   const renderPhoto = ({ item: photo }) => {
     return <Photo {...photo} />;
   };
@@ -55,11 +55,12 @@ export default function Feed({ navigation }) {
   return (
     <ScreenLayout loading={loading}>
       <FlatList
-        onEndReachedThreshold={0}
+        onEndReachedThreshold={0.05}
         onEndReached={() =>
           fetchMore({
             variables: {
               offset: data?.seeFeed?.length,
+              limit: 3,
             },
           })
         }
