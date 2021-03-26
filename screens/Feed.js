@@ -18,6 +18,7 @@ export const FEED_QUERY = gql`
     seeFeed(offset: $offset, limit: $limit) {
       ...PhotoFragment
       user {
+        id
         username
         avatar
       }
@@ -42,6 +43,7 @@ export default function Feed({ navigation }) {
       limit: 2,
     },
   });
+
   const renderPhoto = ({ item: photo }) => {
     return <Photo {...photo} />;
   };
