@@ -114,15 +114,15 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
   return (
     <Container>
       <Header onPress={goToProfile}>
-        <UserAvatar
-          resizeMode='cover'
-          source={{ uri: user.avatar }}
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 25,
-          }}
-        />
+        {user?.avatar !== undefined ? (
+          <UserAvatar
+            resizeMode='cover'
+            source={{
+              uri: user?.avatar,
+            }}
+          />
+        ) : null}
+
         <Username>{user?.username}</Username>
       </Header>
 
@@ -178,7 +178,7 @@ Photo.propTypes = {
   file: PropTypes.string.isRequired,
   isLiked: PropTypes.bool.isRequired,
   likes: PropTypes.number.isRequired,
-  commentNumber: PropTypes.number.isRequired,
+  commentNumber: PropTypes.number,
 };
 
 export default Photo;
