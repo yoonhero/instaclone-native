@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Image } from "react-native";
+import { Image, RefreshControl } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import useWindowDimensions from "react-native/Libraries/Utilities/useWindowDimensions";
 
@@ -126,7 +126,7 @@ export default function Profile({ navigation, route }) {
       setUsername(route?.params?.username);
     }
   }, []);
-  const { data, loading } = useQuery(SEE_PROFILE, {
+  const { data, loading, refetch } = useQuery(SEE_PROFILE, {
     variables: {
       username: route?.params?.username,
     },
@@ -227,6 +227,12 @@ export default function Profile({ navigation, route }) {
       />
     </TouchableOpacity>
   );
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <ScreenLayout loading={loading}>
@@ -259,6 +265,13 @@ export default function Profile({ navigation, route }) {
           data={data?.seeProfile?.photos}
           keyExtractor={(photo) => "" + photo.id}
           renderItem={renderItem}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              tineColor='white'
+            />
+          }
         />
       </PhotoContainer>
     </ScreenLayout>

@@ -9,6 +9,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Alert, Image, StatusBar } from "react-native";
 import { useRef } from "react";
 import * as MediaLibrary from "expo-media-library";
+import { useIsFocused } from "@react-navigation/native";
 
 const Container = styled.View`
   flex: 1;
@@ -71,6 +72,8 @@ export default function TakePhoto({ navigation }) {
   const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
   const [zoom, setZoom] = useState(0);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.front);
+  const isFocused = useIsFocused();
+
   const getPermissions = async () => {
     const { granted } = await Camera.requestPermissionsAsync();
     setOk(granted);
@@ -112,6 +115,9 @@ export default function TakePhoto({ navigation }) {
     if (save) {
       await MediaLibrary.saveToLibraryAsync(takenPhoto);
     }
+    navigation.navigate("UploadForm", {
+      file: takenPhoto,
+    });
   };
   const onDismiss = () => setTakenPhoto("");
   const onUpload = () => {
@@ -129,8 +135,8 @@ export default function TakePhoto({ navigation }) {
 
   return (
     <Container>
-      <StatusBar hidden='true' />
-      {takenPhoto === "" ? (
+      {isFocused ? <StatusBar hidden='true' /> : null}
+      {takenPhoto === "" && isFocused ? (
         <Camera
           type={cameraType}
           style={{ flex: 1 }}
