@@ -169,15 +169,15 @@ function Photo({ id, user, caption, file, isLiked, likes }) {
 }
 
 Photo.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.number,
   user: PropTypes.shape({
     avatar: PropTypes.string,
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string,
   }),
   caption: PropTypes.string,
-  file: PropTypes.string.isRequired,
-  isLiked: PropTypes.bool.isRequired,
-  likes: PropTypes.number.isRequired,
+  file: PropTypes.string,
+  isLiked: PropTypes.bool,
+  likes: PropTypes.number,
   commentNumber: PropTypes.number,
 };
 
