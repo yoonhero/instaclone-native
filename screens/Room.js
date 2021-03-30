@@ -1,4 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client";
+import {
+  useApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
 import { useEffect } from "react";
@@ -8,6 +13,20 @@ import styled from "styled-components/native";
 import { useForm } from "react-hook-form";
 import { Ionicons } from "@expo/vector-icons";
 import useMe from "../hooks/useMe";
+
+const ROOM_UPDATE = gql`
+  subscription roomUpdates($id: Int!) {
+    roomUpdates(id: $id) {
+      id
+      payload
+      user {
+        username
+        avatar
+      }
+      read
+    }
+  }
+`;
 
 const SEND_MESSAGE_MUTATION = gql`
   mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
@@ -77,6 +96,7 @@ const SendButton = styled.TouchableOpacity``;
 
 export default function Room({ route, navigation }) {
   const { data: meData } = useMe();
+
   const { register, setValue, handleSubmit, getValues, watch } = useForm();
 
   const updateSendMessage = (cache, result) => {
@@ -130,11 +150,61 @@ export default function Room({ route, navigation }) {
     }
   );
 
-  const { data, loading } = useQuery(ROOM_QUERY, {
+  const { data, loading, subscribeToMore } = useQuery(ROOM_QUERY, {
     variables: {
       id: route?.params?.id,
     },
   });
+  const client = useApolloClient();
+  const updateQuery = (prevQuery, options) => {
+    const {
+      subscriptionData: {
+        data: { roomUpdates: message },
+      },
+    } = options;
+    if (message.id) {
+      const incomingMessage = client.cache.writeFragment({
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              username
+              avatar
+            }
+            read
+          }
+        `,
+        data: message,
+      });
+      const ROOM_ID = `Room:${route.params.id}`;
+      client.cache.modify({
+        id: ROOM_ID,
+        fields: {
+          messages(prev) {
+            const existingMessage = prev.find(
+              (aMessage) => aMessage.__ref === incomingMessage.__ref
+            );
+            if (existingMessage) {
+              return prev;
+            }
+            return [...prev, incomingMessage];
+          },
+        },
+      });
+    }
+  };
+  useEffect(() => {
+    if (data?.seeRoom) {
+      subscribeToMore({
+        document: ROOM_UPDATE,
+        variables: {
+          id: route?.params?.id,
+        },
+        updateQuery,
+      });
+    }
+  }, [data]);
   const onValid = ({ message }) => {
     if (!sendingMessage) {
       sendMessageMutation({
@@ -145,6 +215,7 @@ export default function Room({ route, navigation }) {
       });
     }
   };
+
   useEffect(() => {
     register("message", { required: true });
   }, [register]);

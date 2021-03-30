@@ -3,11 +3,11 @@ import gql from "graphql-tag";
 import React from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { ROOM_FRAGMENT } from "../fragments";
-import styled from "styled-components/native";
 import ScreenLayout from "../components/ScreenLayout";
-import useMe from "../hooks/useMe";
-import { colors } from "../colors";
 import RoomItem from "../components/rooms/RoomItem";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const SEE_ROOMS_QUERY = gql`
   query seeRooms {
@@ -18,8 +18,20 @@ const SEE_ROOMS_QUERY = gql`
   ${ROOM_FRAGMENT}
 `;
 
-export default function Rooms() {
+export default function Rooms({ navigation }) {
   const { data, loading } = useQuery(SEE_ROOMS_QUERY);
+  const PlusButton = () => (
+    <TouchableOpacity
+      style={{ marginRight: 25 }}
+      onPress={() => navigation.navigate("PlusRoom")}>
+      <FontAwesome5 name='user-plus' color='white' size={20} />
+    </TouchableOpacity>
+  );
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: PlusButton,
+    });
+  }, []);
   const renderItem = ({ item: room }) => <RoomItem {...room} />;
   return (
     <ScreenLayout loading={loading}>

@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import Rooms from "../screens/Rooms";
 import Room from "../screens/Room";
+import PlusRoom from "../screens/PlusRoom";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,7 @@ export default function MessagesNav() {
         component={Rooms}
       />
       <Stack.Screen name='Room' component={Room} />
+      <Stack.Screen name='PlusRoom' component={PlusRoom} />
     </Stack.Navigator>
   );
 }
