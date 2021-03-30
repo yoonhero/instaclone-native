@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { logUserOut } from "../apollo";
 import Photo from "../components/Photo";
@@ -53,7 +54,18 @@ export default function Feed({ navigation }) {
     setRefreshing(false);
   };
   const [refreshing, setRefreshing] = useState(false);
-
+  const MessagesButton = () => (
+    <TouchableOpacity
+      style={{ marginRight: 25 }}
+      onPress={() => navigation.navigate("Messages")}>
+      <Ionicons name='paper-plane' color='white' size={20} />
+    </TouchableOpacity>
+  );
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: MessagesButton,
+    });
+  }, []);
   return (
     <ScreenLayout loading={loading}>
       <FlatList

@@ -32,7 +32,7 @@ const httpLink = createHttpLink({
 });
 
 const uploadHttpLink = createUploadLink({
-  uri: "https://instaclone-backend-yoonhero.herokuapp.com/graphql",
+  uri: "http://localhost:4000/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
