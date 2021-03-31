@@ -4,6 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Rooms from "../screens/Rooms";
 import Room from "../screens/Room";
 import PlusRoom from "../screens/PlusRoom";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import FirstMessage from "../screens/FirstMessage";
 
 const Stack = createStackNavigator();
 
@@ -30,6 +32,7 @@ export default function MessagesNav() {
       />
       <Stack.Screen name='Room' component={Room} />
       <Stack.Screen name='PlusRoom' component={PlusRoom} />
+      <Stack.Screen name='FirstMessage' component={FirstMessage} />
     </Stack.Navigator>
   );
 }

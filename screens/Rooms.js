@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
-import React from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import React, { useState } from "react";
+import { FlatList, Image, RefreshControl, Text, View } from "react-native";
 import { ROOM_FRAGMENT } from "../fragments";
 import ScreenLayout from "../components/ScreenLayout";
 import RoomItem from "../components/rooms/RoomItem";
@@ -19,7 +19,8 @@ const SEE_ROOMS_QUERY = gql`
 `;
 
 export default function Rooms({ navigation }) {
-  const { data, loading } = useQuery(SEE_ROOMS_QUERY);
+  const { data, loading, refetch } = useQuery(SEE_ROOMS_QUERY);
+  const [refreshing, setRefreshing] = useState(false);
   const PlusButton = () => (
     <TouchableOpacity
       style={{ marginRight: 25 }}
@@ -32,22 +33,26 @@ export default function Rooms({ navigation }) {
       headerRight: PlusButton,
     });
   }, []);
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
   const renderItem = ({ item: room }) => <RoomItem {...room} />;
   return (
     <ScreenLayout loading={loading}>
       <FlatList
-        ItemSeparatorComponent={
-          <View
-            style={{
-              width: "100%",
-              height: 1,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-            }}></View>
-        }
         style={{ width: "100%" }}
         data={data?.seeRooms}
         renderItem={renderItem}
         keyExtractor={(room) => "" + room.id}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tineColor='white'
+          />
+        }
       />
     </ScreenLayout>
   );

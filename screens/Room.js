@@ -13,6 +13,7 @@ import styled from "styled-components/native";
 import { useForm } from "react-hook-form";
 import { Ionicons } from "@expo/vector-icons";
 import useMe from "../hooks/useMe";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const ROOM_UPDATE = gql`
   subscription roomUpdates($id: Int!) {
@@ -219,9 +220,16 @@ export default function Room({ route, navigation }) {
   useEffect(() => {
     register("message", { required: true });
   }, [register]);
+  const headerLeft = () => (
+    <TouchableOpacity onPress={() => navigation.navigate("Rooms")}>
+      <Ionicons name='arrow-back' color='white' size={28} />
+    </TouchableOpacity>
+  );
   useEffect(() => {
     navigation.setOptions({
       title: `Conversation with ${route?.params?.talkingTo?.username}`,
+
+      headerLeft,
     });
   }, []);
   const renderItem = ({ item: message }) => (
