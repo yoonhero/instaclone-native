@@ -5,8 +5,7 @@ import {
   useSubscription,
 } from "@apollo/client";
 import gql from "graphql-tag";
-import React from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, KeyboardAvoidingView, Text, View } from "react-native";
 import ScreenLayout from "../components/ScreenLayout";
 import styled from "styled-components/native";
@@ -54,8 +53,19 @@ const ROOM_QUERY = gql`
     }
   }
 `;
+
+const READ_MESSAGE_MUTATION = gql`
+  mutation readMessage($id: Int!) {
+    readMessage(id: $id) {
+      ok
+      error
+    }
+  }
+`;
+
 const MessageContiainer = styled.View`
   padding: 0px 10px;
+
   flex-direction: ${(props) => (props.outGoing ? "row-reverse" : "row")};
   align-items: flex-end;
 `;
@@ -71,8 +81,10 @@ const Username = styled.Text`
 `;
 const Message = styled.Text`
   color: white;
-  background-color: rgba(255, 255, 255, 0.3);
-  padding: 5px 10px;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "rgba(255, 255, 255, 0.3)"};
+
+  padding: 10px 20px;
   overflow: hidden;
   border-radius: 10px;
   font-size: 16px;
@@ -156,6 +168,9 @@ export default function Room({ route, navigation }) {
       id: route?.params?.id,
     },
   });
+
+  const [readMessageMutation] = useMutation(READ_MESSAGE_MUTATION);
+  const [readMessage, setReadMessage] = useState(0);
   const client = useApolloClient();
   const updateQuery = (prevQuery, options) => {
     const {
@@ -232,16 +247,34 @@ export default function Room({ route, navigation }) {
       headerLeft,
     });
   }, []);
+
+  useEffect(() => {
+    readMessageMutation({
+      variables: {
+        id: readMessage,
+      },
+    });
+  }, [readMessage]);
   const renderItem = ({ item: message }) => (
     <MessageContiainer
       outGoing={message.user.username !== route?.params?.talkingTo?.username}>
-      <Author>
-        <Avatar source={{ uri: message.user.avatar }} />
-      </Author>
-      <Message>{message.payload}</Message>
+      {message.user.username === route?.params?.talkingTo?.username ? (
+        <Author>
+          <Avatar source={{ uri: message.user.avatar }} />
+        </Author>
+      ) : null}
+
+      <Message
+        outGoing={message.user.username !== route?.params?.talkingTo?.username}>
+        {message.payload}
+      </Message>
     </MessageContiainer>
   );
+
   const messages = [...(data?.seeRoom?.messages ?? [])];
+  messages.sort(function (a, b) {
+    return a.id - b.id;
+  });
   messages.reverse();
   return (
     <KeyboardAvoidingView
